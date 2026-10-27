@@ -19,6 +19,9 @@ const harmonyResolveRequest =
  * @type {import("metro-config").ConfigT}
  */
 const config = {
+  // shims/gl-react re-export 上级目录（packages/gl-react）的 src/*.ts(x)，
+  // Metro 默认只打包 projectRoot 内的文件，需把上级目录加入 watchFolders。
+  watchFolders: [path.resolve(__dirname, '..')],
   transformer: {
     getTransformOptions: async () => ({
       transform: {
@@ -28,6 +31,9 @@ const config = {
     }),
   },
   resolver: {
+    // src/ 里的裸包依赖（gl-shader、invariant、react 等）只装在
+    // example/node_modules，上级目录没有 node_modules，需显式指定解析路径。
+    nodeModulesPaths: [path.resolve(__dirname, 'node_modules')],
     // gl-react 的纹理加载器（webgltexture-loader-expo）引用 expo-asset /
     // expo-modules-core，本 Demo 不使用该路径，用本地 shim 提供最小 API 形状
     // （同 expo-gl example 的做法，见 shims/ 目录内注释）。
