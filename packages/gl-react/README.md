@@ -4,7 +4,7 @@
   <h1 align="center"> <code>gl-react</code> </h1>
 </p>
 
-本项目基于 [gl-react](https://github.com/gre/gl-react) 开发，为 React Native 鸿蒙（OpenHarmony）适配版本。
+本项目基于 [gl-react-native](https://github.com/gre/gl-react) 开发，为 React Native 鸿蒙（OpenHarmony）适配版本。
 
 该三方库的鸿蒙适配版本支持直接从仓库下载 tgz 使用，版本所属关系如下：
 
@@ -16,9 +16,7 @@
 
 ## 简介
 
-gl-react 是一个通用的 React 库，用于编写和组合 WebGL 着色器。<br/>
-业务以声明式的 `<Surface>` / `<Node>` 组件树描述渲染图，着色器经 `Shaders.create` 注册后即可组合出滤镜、纹理处理等效果。<br/>
-鸿蒙适配由 `@react-native-ohos/gl-react`、`@react-native-ohos/gl-react-native`（别名包，纯 JS）与 `@react-native-ohos/expo-gl`（原生 ExpoGLView：XComponent + EGL + GLES3）组成，业务代码零改动。
+gl-react-native 是一个通用的 React 库，用于编写和组合 WebGL 着色器。
 
 ## 下载安装
 
@@ -36,7 +34,7 @@ npm install @react-native-ohos/gl-react-native
 yarn add @react-native-ohos/gl-react-native
 ```
 
-## 依赖关系说明（如有则保留，不存在则删除）
+## 依赖关系说明
 
 请根据应用工程使用的 RN 框架版本，选择对应版本的三方库进行引入，版本对应关系如下：
 
@@ -52,7 +50,7 @@ yarn add @react-native-ohos/gl-react-native
 
 > [!TIP] 请确保引入的三方库版本与应用工程的 RN 框架版本匹配，不匹配的版本可能导致编译或运行异常。`gl-react`、`gl-react-expo` 直接使用 npm 官方版本（`^6.0.0`），无需修改。
 
-## Link（如有则保留，不存在则删除）
+## Link
 
 |                                      | 是否支持autolink | RN框架版本 |
 |--------------------------------------|----------------|-----------|
@@ -67,6 +65,33 @@ yarn add @react-native-ohos/gl-react-native
 
 首先需要使用 DevEco Studio 打开项目里的 HarmonyOS 工程 `harmony`。
 
+### 1. Overrides RN SDK
+
+为了让工程依赖同一个版本的 RN SDK，需要在工程根目录的 `oh-package.json5` 添加 overrides 字段，指向工程需要使用的 RN SDK 版本。替换的版本既可以是一个具体的版本号，也可以是一个模糊版本，还可以是本地存在的 HAR 包或源码目录。
+
+关于该字段的作用请阅读[官方说明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-oh-package-json5-V5#zh-cn_topic_0000001792256137_overrides)
+
+```json
+{
+  "overrides": {
+    "@rnoh/react-native-openharmony": "^0.72.5" // ohpm 在线版本
+    // "@rnoh/react-native-openharmony" : "./react_native_openharmony.har" // 指向本地 har 包的路径
+    // "@rnoh/react-native-openharmony" : "./react_native_openharmony" // 指向源码路径
+  }
+}
+```
+
+### 2. 引入原生端代码
+
+目前有两种方法：
+
+- 通过 har 包引入；
+- 直接链接源码。
+
+方法一：通过 har 包引入（推荐）
+
+> [!TIP] har 包位于三方库安装路径的 `harmony` 文件夹下。
+
 打开 `entry/oh-package.json5`，添加以下依赖
 
 ```json
@@ -77,7 +102,32 @@ yarn add @react-native-ohos/gl-react-native
 
 `harmony/oh-package.json5` 中按实际路径相应添加（`file:../node_modules/...`）。
 
-> [!TIP] RNOH autolinking 会在构建时自动注册 ExpoGlPackage（含 ExpoGLView 组件与 ExpoGL/ExpoAsset TurboModule），无需手工修改 CMakeLists / PackageProvider / RNPackagesFactory。
+方法二：直接链接源码
+
+> [!TIP] 如需使用直接链接源码，请参考 [expo-gl 源码仓库](https://github.com/tyBrave/expo/tree/main/packages/expo-gl) 的 `harmony` 目录。
+
+### 3. 配置 CMakeLists 和引入 ExpoGlPackage
+
+> [!TIP] 本库支持 autolink，RNOH 构建时会自动生成 `entry/src/main/cpp/autolinking.cmake` 并完成 ExpoGlPackage 的注册，使用 autolink 的工程无需手工修改 `CMakeLists.txt` 与 `PackageProvider.cpp`。
+
+### 4. 在 ArkTs 侧引入 ExpoGLView
+
+> [!TIP] ExpoGLView 为 codegen 组件，由 autolinking 自动注册，无需在 `buildCustomComponent` 与 `arkTsComponentNames` 中添加组件名。
+
+### 5. 在 ArkTs 侧引入 ExpoGlPackage
+
+autolink 工程无需此步。如工程关闭了 autolinking，打开 `entry/src/main/ets/RNPackagesFactory.ts`，添加：
+
+```diff
+  ...
++ import {ExpoGlPackage} from '@react-native-ohos/expo-gl/ts';
+
+export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
+  return [
++    new ExpoGlPackage(ctx)
+  ];
+}
+```
 </details>
 
 ### 运行
@@ -224,7 +274,7 @@ await GLView.destroyContextAsync(gl);
 | createSurface | factory | No  | all | yes | 平台绑定工厂，适配内部使用 |
 | listSurfaces | function | No  | all | yes | 枚举当前所有 Surface 实例（调试用） |
 | Visitor / VisitorLogger / Visitors | object | No  | all | yes | 绘制生命周期观察者（调试用） |
-| Backbuffer（字符串常量） | constant | No  | all | no | 旧写法，等价 `Uniform.Backbuffer`，使用会打印弃用警告（未验证） |
+| Backbuffer（字符串常量） | constant | No  | all | no | 旧写法，等价 `Uniform.Backbuffer`，使用会打印弃用警告 |
 
 ### 属性
 SurfaceProps
@@ -306,9 +356,7 @@ BusProps
 - 不支持 `gl.texImage2D` 六参 DOM/ImageSource 源形式
 - WebP 图片纹理不支持（原生解码仅 PNG/JPEG）
 - `captureAsDataURL` / `captureAsBlob` 上游仅 Web 实现，鸿蒙不提供（请用 `takeSnapshotAsync` / `capture`）
-- Reanimated worklet 访问 GL（`enableExperimentalWorkletSupport` / `getWorkletContext`）未验证，按不支持
 - `msaaSamples`（GLView prop）上游即 iOS 专属，鸿蒙忽略该值
-- 同屏多 Surface 并发渲染未充分压测
 
 ## 其他
 无
@@ -331,8 +379,8 @@ BusProps
 
 ## 贡献代码
 
-使用过程中发现任何问题都可以提交 [Issue](https://github.com/tyBrave/gl-react/issues)，当然，也非常欢迎提交 [PR](https://github.com/tyBrave/gl-react/pulls) 。
+使用过程中发现任何问题都可以提交 [Issue](https://github.com/react-native-oh-library/gl-react)，当然，也非常欢迎提交 [PR](https://github.com/react-native-oh-library/gl-react/pulls) 。
 
 ## 开源协议
 
-本项目基于 [The MIT License (MIT)](./LICENSE) ，请自由地享受和参与开源。
+本项目基于 [The MIT License (MIT)](https://github.com/gre/gl-react/blob/master/LICENSE) ，请自由地享受和参与开源。
