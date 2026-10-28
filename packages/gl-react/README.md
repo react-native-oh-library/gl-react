@@ -1,10 +1,10 @@
 > 文档模板：v0.4.2
 
 <p align="center">
-  <h1 align="center"> <code>gl-react</code> </h1>
+  <h1 align="center"> <code>gl-react-native</code> </h1>
 </p>
 
-本项目基于 [gl-react-native](https://github.com/gre/gl-react) 开发，为 React Native 鸿蒙（OpenHarmony）适配版本。
+本项目基于 [gl-react-native](https://github.com/react-native-oh-library/gl-react/tree/master/packages/gl-react-native) 开发，为 React Native 鸿蒙（OpenHarmony）适配版本。
 
 该三方库的鸿蒙适配版本支持直接从仓库下载 tgz 使用，版本所属关系如下：
 
@@ -115,13 +115,23 @@ project(rnapp)
 cmake_minimum_required(VERSION 3.4.1)
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
 set(RNOH_APP_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(OH_MODULE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../oh_modules")
-set(RNOH_CPP_DIR "${OH_MODULE_DIR}/@rnoh/react-native-openharmony/src/main/include")
-...
+set(NODE_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../node_modules")
++ set(OH_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/../../../oh_modules")
+set(RNOH_CPP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../react-native-harmony/harmony/cpp")
+set(LOG_VERBOSITY_LEVEL 1)
+set(CMAKE_ASM_FLAGS "-Wno-error=unused-command-line-argument -Qunused-arguments")
+set(CMAKE_CXX_FLAGS "-fstack-protector-strong -Wl,-z,relro,-z,now,-z,noexecstack -s -fPIE -pie")
+set(WITH_HITRACE_SYSTRACE 1) # for other CMakeLists.txt files to use
+add_compile_definitions(WITH_HITRACE_SYSTRACE)
 
-# RNOH_BEGIN: add_plugin_subdirectories
-+ include("${CMAKE_CURRENT_SOURCE_DIR}/autolinking.cmake")
-# RNOH_END: add_plugin_subdirectories
+add_subdirectory("${RNOH_CPP_DIR}" ./rn)
+
+# RNOH_BEGIN: manual_package_linking_1
+add_subdirectory("../../../../sample_package/src/main/cpp" ./sample-package)
++ add_subdirectory("${OH_MODULES}/@react-native-ohos/expo-gl/src/main/cpp" ./expo-gl)
+# RNOH_END: manual_package_linking_1
+
+file(GLOB GENERATED_CPP_FILES "./generated/*.cpp")
 
 add_library(rnoh_app SHARED
     ${GENERATED_CPP_FILES}
@@ -130,24 +140,28 @@ add_library(rnoh_app SHARED
 )
 target_link_libraries(rnoh_app PUBLIC rnoh)
 
-# RNOH_BEGIN: link_plugins
-+ autolink_libraries(rnoh_app)
-# RNOH_END: link_plugins
+# RNOH_BEGIN: manual_package_linking_2
+target_link_libraries(rnoh_app PUBLIC rnoh_sample_package)
++ target_link_libraries(rnoh_app PUBLIC expo_gl)
+# RNOH_END: manual_package_linking_2
 ```
 
-> [!TIP] `autolinking.cmake` 与 `RNOHPackagesFactory` 由 RNOH 工具链在构建时自动生成覆盖；不支持 autolink 的三方库才需要 `add_subdirectory` / `target_link_libraries` 手工注册。
+> [!TIP] har 包安装（ohpm install）后，C++ 源码解包于 `oh_modules/@react-native-ohos/expo-gl/src/main/cpp`，其 CMake 目标名为 `expo_gl`。
 
 打开 `entry/src/main/cpp/PackageProvider.cpp`，添加：
 
 ```diff
 #include "RNOH/PackageProvider.h"
-+ #include "RNOHPackagesFactory.h"
+#include "SamplePackage.h"
++ #include "ExpoGlPackage.h"
 
 using namespace rnoh;
 
 std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Context ctx) {
-+     auto packages = createRNOHPackages(ctx);
-+     return packages;
+    return {
+      std::make_shared<SamplePackage>(ctx),
++     std::make_shared<ExpoGlPackage>(ctx)
+    };
 }
 ```
 
