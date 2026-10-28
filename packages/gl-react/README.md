@@ -108,19 +108,87 @@ yarn add @react-native-ohos/gl-react-native
 
 ### 3. 配置 CMakeLists 和引入 ExpoGlPackage
 
-> [!TIP] 本库支持 autolink，RNOH 构建时会自动生成 `entry/src/main/cpp/autolinking.cmake` 并完成 ExpoGlPackage 的注册，使用 autolink 的工程无需手工修改 `CMakeLists.txt` 与 `PackageProvider.cpp`。
+打开 `entry/src/main/cpp/CMakeLists.txt`，添加：
+
+```diff
+project(rnapp)
+cmake_minimum_required(VERSION 3.4.1)
+set(CMAKE_SKIP_BUILD_RPATH TRUE)
+set(RNOH_APP_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(OH_MODULE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../oh_modules")
+set(RNOH_CPP_DIR "${OH_MODULE_DIR}/@rnoh/react-native-openharmony/src/main/include")
+...
+
+# RNOH_BEGIN: add_plugin_subdirectories
++ include("${CMAKE_CURRENT_SOURCE_DIR}/autolinking.cmake")
+# RNOH_END: add_plugin_subdirectories
+
+add_library(rnoh_app SHARED
+    ${GENERATED_CPP_FILES}
+    "./PackageProvider.cpp"
+    "${RNOH_CPP_DIR}/RNOHAppNapiBridge.cpp"
+)
+target_link_libraries(rnoh_app PUBLIC rnoh)
+
+# RNOH_BEGIN: link_plugins
++ autolink_libraries(rnoh_app)
+# RNOH_END: link_plugins
+```
+
+> [!TIP] `autolinking.cmake` 与 `RNOHPackagesFactory` 由 RNOH 工具链在构建时自动生成覆盖；不支持 autolink 的三方库才需要 `add_subdirectory` / `target_link_libraries` 手工注册。
+
+打开 `entry/src/main/cpp/PackageProvider.cpp`，添加：
+
+```diff
+#include "RNOH/PackageProvider.h"
++ #include "RNOHPackagesFactory.h"
+
+using namespace rnoh;
+
+std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Context ctx) {
++     auto packages = createRNOHPackages(ctx);
++     return packages;
+}
+```
 
 ### 4. 在 ArkTs 侧引入 ExpoGLView
 
-> [!TIP] ExpoGLView 为 codegen 组件，由 autolinking 自动注册，无需在 `buildCustomComponent` 与 `arkTsComponentNames` 中添加组件名。
-
-### 5. 在 ArkTs 侧引入 ExpoGlPackage
-
-autolink 工程无需此步。如工程关闭了 autolinking，打开 `entry/src/main/ets/RNPackagesFactory.ts`，添加：
+找到 **function buildCustomRNComponent()**，一般位于 `entry/src/main/ets/pages/Index.ets` 或 `entry/src/main/ets/rn/LoadBundle.ets`，添加：
 
 ```diff
   ...
-+ import {ExpoGlPackage} from '@react-native-ohos/expo-gl/ts';
++ import { ExpoGLView } from "@react-native-ohos/expo-gl"
+
+@Builder
+export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
+  ...
++ if (ctx.componentName === ExpoGLView.NAME) {
++   ExpoGLView({
++     ctx: ctx.rnComponentContext,
++     tag: ctx.tag
++   })
++ }
+  ...
+}
+```
+
+> [!TIP] 本库使用了混合方案，需要添加组件名。
+
+在`entry/src/main/ets/pages/Index.ets` 或 `entry/src/main/ets/rn/LoadBundle.ets` 找到常量 `arkTsComponentNames` 在其数组里添加组件名
+
+```diff
+const arkTsComponentNames: Array<string> = [
++ ExpoGLView.NAME
+  ];
+```
+
+### 5. 在 ArkTs 侧引入 ExpoGlPackage
+
+打开 `entry/src/main/ets/RNPackagesFactory.ets`，添加：
+
+```diff
+  ...
++ import { ExpoGlPackage } from "@react-native-ohos/expo-gl";
 
 export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
   return [
@@ -128,6 +196,8 @@ export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
   ];
 }
 ```
+
+> [!TIP] autolink 工程构建时 `RNOHPackagesFactory` 自动生成，ExpoGL/ExpoAsset TurboModule 注册自动完成，无需手工添加本步；仅当工程未接入 autolinking 时需要按上述方式手工注册。
 </details>
 
 ### 运行
@@ -149,8 +219,7 @@ ohpm install
 
 本文档内容基于以下版本验证通过：
 
-1. RNOH: 0.72.5; SDK: HarmonyOS 6.0.0 Release SDK; IDE: DevEco Studio 5.0; ROM: 6.0.0;
-2. RNOH: 0.72.5; SDK: HarmonyOS NEXT SDK(API 13); IDE: DevEco Studio 5.0; ROM: 5.0.0;
+1. RNOH: 0.72.139; SDK: HarmonyOS 6.0.0 Release SDK; IDE: DevEco Studio 5.0; ROM: 6.0.0;
 
 ### 权限要求
 
@@ -165,14 +234,6 @@ ohpm install
   },
 ],
 ```
-
-- 如果使用 `require()` 或 rawfile 引用本地图片纹理，资源文件经 ExpoAsset 落入应用沙箱或放置到 HarmonyOS 工程 rawfile 下对应的路径中，以 `resource://RAWFILE/<相对路径>` 引用
-
-  rawfile 路径：`entry/src/main/resources/rawfile`
-
-### 编译运行API要求（如有则保留，不存在则删除）
-
-> [!TIP] 当前三方库所有版本均已实现版本隔离，支持在 `API13+` 工程编译，及 `API13+` ROM运行。
 
 ## 使用示例
 下面的代码展示了这个库的基本使用场景：
