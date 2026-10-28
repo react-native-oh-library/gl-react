@@ -1,10 +1,10 @@
 > Document Template: v0.4.2
 
 <p align="center">
-  <h1 align="center"> <code>gl-react</code> </h1>
+  <h1 align="center"> <code>gl-react-native</code> </h1>
 </p>
 
-This project is based on [gl-react](https://github.com/gre/gl-react) and is the OpenHarmony adaptation of gl-react for React Native.
+This project is based on [gl-react-native](https://github.com/react-native-oh-library/gl-react/tree/master/packages/gl-react-native) and is the OpenHarmony adaptation of gl-react-native for React Native.
 
 The OpenHarmony-adapted packages of this library can be downloaded as tgz directly from the repository. The version mapping is as follows:
 
@@ -16,9 +16,9 @@ The OpenHarmony-adapted packages of this library can be downloaded as tgz direct
 
 ## Introduction
 
-gl-react is a generic React library to write and compose WebGL shaders.<br/>
-Applications describe the render graph declaratively with a `<Surface>` / `<Node>` component tree; shaders registered via `Shaders.create` compose into filters, texture processing effects and more.<br/>
-The OpenHarmony adaptation consists of `@react-native-ohos/gl-react` and `@react-native-ohos/gl-react-native` (alias packages, pure JS) plus `@react-native-ohos/expo-gl` (native ExpoGLView: XComponent + EGL + GLES3), with zero changes to business code.
+gl-react-native is a generic React library to write and compose WebGL shaders.
+
+> [!TIP] Using this library requires [@react-native-ohos/expo-gl](https://github.com/tyBrave/expo/tree/main/packages/expo-gl); for its integration steps, refer to the [Link]() section below.
 
 ## Installation
 
@@ -36,7 +36,7 @@ npm install @react-native-ohos/gl-react-native
 yarn add @react-native-ohos/gl-react-native
 ```
 
-## Dependencies (keep this section if applicable, otherwise remove it)
+## Dependencies
 
 Choose the library versions matching the RN framework version of your application project. The version mapping is as follows:
 
@@ -52,7 +52,7 @@ The OpenHarmony implementation of this library depends on the adapted libraries 
 
 > [!TIP] Make sure the library versions match the RN framework version of the project; mismatched versions may cause build or runtime failures. `gl-react` and `gl-react-expo` use the official npm versions (`^6.0.0`) directly.
 
-## Link (keep this section if applicable, otherwise remove it)
+## Link
 
 |                                      | Autolink Supported | RN Framework Version |
 |--------------------------------------|----------------|-----------|
@@ -67,6 +67,33 @@ If your version supports Autolink and the project has integrated Autolink, skip 
 
 Open the HarmonyOS project `harmony` with DevEco Studio.
 
+### 1. Overrides RN SDK
+
+To make the project depend on the same RN SDK version, add the `overrides` field in the root `oh-package.json5` of the project, pointing to the RN SDK version to use. The value can be a specific version, a fuzzy version, or a local HAR package or source directory.
+
+For how this field works, read the [official documentation](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-oh-package-json5-V5#zh-cn_topic_0000001792256137_overrides)
+
+```json
+{
+  "overrides": {
+    "@rnoh/react-native-openharmony": "~0.72.139" // ohpm online version
+    // "@rnoh/react-native-openharmony" : "./react_native_openharmony.har" // path to a local har package
+    // "@rnoh/react-native-openharmony" : "./react_native_openharmony" // path to source code
+  }
+}
+```
+
+### 2. Import the Native Code
+
+There are currently two methods:
+
+- Import via a har package;
+- Link the source code directly.
+
+Method 1: Import via a har package (recommended)
+
+> [!TIP] The har package is located in the `harmony` folder of the installed library.
+
 Open `entry/oh-package.json5` and add the following dependency
 
 ```json
@@ -77,8 +104,114 @@ Open `entry/oh-package.json5` and add the following dependency
 
 Add the corresponding dependency in `harmony/oh-package.json5` as well (`file:../node_modules/...`), according to the actual path.
 
-> [!TIP] RNOH autolinking registers ExpoGlPackage automatically at build time (including the ExpoGLView component and the ExpoGL/ExpoAsset TurboModules). No manual changes to CMakeLists / PackageProvider / RNPackagesFactory are required.
-</details>
+Method 2: Link the source code directly
+
+> [!TIP] To link the source code directly, refer to the `harmony` directory of the [expo-gl source repository](https://github.com/tyBrave/expo/tree/main/packages/expo-gl).
+
+### 3. Configure CMakeLists and import ExpoGlPackage
+
+Open `entry/src/main/cpp/CMakeLists.txt` and add:
+
+```diff
+project(rnapp)
+cmake_minimum_required(VERSION 3.4.1)
+set(CMAKE_SKIP_BUILD_RPATH TRUE)
+set(RNOH_APP_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(NODE_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../node_modules")
++ set(OH_MODULES "${CMAKE_CURRENT_SOURCE_DIR}/../../../oh_modules")
+set(RNOH_CPP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../react-native-harmony/harmony/cpp")
+set(LOG_VERBOSITY_LEVEL 1)
+set(CMAKE_ASM_FLAGS "-Wno-error=unused-command-line-argument -Qunused-arguments")
+set(CMAKE_CXX_FLAGS "-fstack-protector-strong -Wl,-z,relro,-z,now,-z,noexecstack -s -fPIE -pie")
+set(WITH_HITRACE_SYSTRACE 1) # for other CMakeLists.txt files to use
+add_compile_definitions(WITH_HITRACE_SYSTRACE)
+
+add_subdirectory("${RNOH_CPP_DIR}" ./rn)
+
+# RNOH_BEGIN: manual_package_linking_1
+add_subdirectory("../../../../sample_package/src/main/cpp" ./sample-package)
++ add_subdirectory("${OH_MODULES}/@react-native-ohos/expo-gl/src/main/cpp" ./expo-gl)
+# RNOH_END: manual_package_linking_1
+
+file(GLOB GENERATED_CPP_FILES "./generated/*.cpp")
+
+add_library(rnoh_app SHARED
+    ${GENERATED_CPP_FILES}
+    "./PackageProvider.cpp"
+    "${RNOH_CPP_DIR}/RNOHAppNapiBridge.cpp"
+)
+target_link_libraries(rnoh_app PUBLIC rnoh)
+
+# RNOH_BEGIN: manual_package_linking_2
+target_link_libraries(rnoh_app PUBLIC rnoh_sample_package)
++ target_link_libraries(rnoh_app PUBLIC expo_gl)
+# RNOH_END: manual_package_linking_2
+```
+
+> [!TIP] After the har package is installed (ohpm install), the C++ sources are unpacked at `oh_modules/@react-native-ohos/expo-gl/src/main/cpp`, and the CMake target name is `expo_gl`.
+
+Open `entry/src/main/cpp/PackageProvider.cpp` and add:
+
+```diff
+#include "RNOH/PackageProvider.h"
+#include "SamplePackage.h"
++ #include "ExpoGlPackage.h"
+
+using namespace rnoh;
+
+std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Context ctx) {
+    return {
+      std::make_shared<SamplePackage>(ctx),
++     std::make_shared<ExpoGlPackage>(ctx)
+    };
+}
+```
+
+### 4. Import ExpoGLView on the ArkTS side
+
+Find **function buildCustomRNComponent()**, usually located in `entry/src/main/ets/pages/Index.ets` or `entry/src/main/ets/rn/LoadBundle.ets`, and add:
+
+```diff
+  ...
++ import { ExpoGLView } from "@react-native-ohos/expo-gl"
+
+@Builder
+export function buildCustomRNComponent(ctx: ComponentBuilderContext) {
+  ...
++ if (ctx.componentName === ExpoGLView.NAME) {
++   ExpoGLView({
++     ctx: ctx.rnComponentContext,
++     tag: ctx.tag
++   })
++ }
+  ...
+}
+```
+
+> [!TIP] This library uses the hybrid approach; the component name must be added.
+
+Find the constant `arkTsComponentNames` in `entry/src/main/ets/pages/Index.ets` or `entry/src/main/ets/rn/LoadBundle.ets` and add the component name to its array
+
+```diff
+const arkTsComponentNames: Array<string> = [
++ ExpoGLView.NAME
+  ];
+```
+
+### 5. Import ExpoGlPackage on the ArkTS side
+
+Open `entry/src/main/ets/RNPackagesFactory.ets` and add:
+
+```diff
+  ...
++ import { ExpoGlPackage } from "@react-native-ohos/expo-gl";
+
+export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
+  return [
++    new ExpoGlPackage(ctx)
+  ];
+}
+```
 
 ### Run
 
@@ -99,8 +232,7 @@ Then build and run.
 
 The content of this document has been verified on:
 
-1. RNOH: 0.72.5; SDK: HarmonyOS 6.0.0 Release SDK; IDE: DevEco Studio 5.0; ROM: 6.0.0;
-2. RNOH: 0.72.5; SDK: HarmonyOS NEXT SDK(API 13); IDE: DevEco Studio 5.0; ROM: 5.0.0;
+1. RNOH: 0.72.139; SDK: HarmonyOS 6.0.0 Release SDK; IDE: DevEco Studio 5.0; ROM: 6.0.0;
 
 ### Permission Requirements
 
@@ -115,14 +247,6 @@ The content of this document has been verified on:
   },
 ],
 ```
-
-- If local image textures are referenced via `require()` or rawfile, the resource files are delivered into the application sandbox via ExpoAsset, or placed under the rawfile path of the HarmonyOS project and referenced as `resource://RAWFILE/<relative path>`
-
-  rawfile path: `entry/src/main/resources/rawfile`
-
-### Compilation and API Requirements (keep this section if applicable, otherwise remove it)
-
-> [!TIP] All current versions of this library implement version isolation: they can be compiled on `API13+` projects and run on `API13+` ROMs.
 
 ## Usage Example
 The following code shows the basic usage scenario of this library:
@@ -224,7 +348,7 @@ await GLView.destroyContextAsync(gl);
 | createSurface | factory | No  | all | yes | Platform binding factory, used internally by the adaptation |
 | listSurfaces | function | No  | all | yes | Enumerates all current Surface instances (debugging) |
 | Visitor / VisitorLogger / Visitors | object | No  | all | yes | Draw lifecycle observers (debugging) |
-| Backbuffer (string constant) | constant | No  | all | no | Legacy form, equivalent to `Uniform.Backbuffer`; emits a deprecation warning (not verified) |
+| Backbuffer (string constant) | constant | No  | all | no | Legacy form, equivalent to `Uniform.Backbuffer`; emits a deprecation warning when used |
 
 ### Props
 SurfaceProps
@@ -302,13 +426,10 @@ BusProps
 ## Known Issues
 
 - WebGL extensions are not bridged (`gl.getExtension` returns null); capabilities like float linear filtering rely on the built-in uint8 fallback path
-- `image/jpeg` snapshots fall back to PNG (identical pixel content, only the container differs); `webp` snapshots fall back to `png` likewise
 - The six-argument DOM/ImageSource source form of `gl.texImage2D` is not supported
-- WebP image textures are not supported (native decoding supports PNG/JPEG only)
-- `captureAsDataURL` / `captureAsBlob` are upstream Web-only implementations and are not provided (use `takeSnapshotAsync` / `capture`)
-- Reanimated worklet GL access (`enableExperimentalWorkletSupport` / `getWorkletContext`) is not verified, treated as unsupported
+- WebP image textures are not supported
+- `captureAsDataURL` / `captureAsBlob` are upstream Web-only implementations and are not provided on OpenHarmony (use `takeSnapshotAsync` / `capture`)
 - `msaaSamples` (GLView prop) is upstream iOS-only; the value is ignored on OpenHarmony
-- Concurrent rendering of multiple Surfaces on one screen is not stress-tested
 
 ## Others
 None
@@ -331,8 +452,8 @@ None
 
 ## Contributing
 
-If you encounter any problems during usage, feel free to submit an [Issue](https://github.com/tyBrave/gl-react/issues). Pull requests are also highly welcome via [PR](https://github.com/tyBrave/gl-react/pulls).
+If you encounter any problems during usage, feel free to submit an [Issue](https://github.com/react-native-oh-library/gl-react). Pull requests are also highly welcome via [PR](https://github.com/react-native-oh-library/gl-react/pulls).
 
 ## License
 
-This project is based on [The MIT License (MIT)](./LICENSE). Enjoy and contribute to open source freely.
+This project is based on [The MIT License (MIT)](https://github.com/gre/gl-react/blob/master/LICENSE). Enjoy and contribute to open source freely.

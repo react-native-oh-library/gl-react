@@ -17,6 +17,7 @@
 ## 简介
 
 gl-react-native 是一个通用的 React 库，用于编写和组合 WebGL 着色器。
+> [!TIP] 使用需引入[@react-native-ohos/expo-gl](https://github.com/tyBrave/expo/tree/main/packages/expo-gl),其引入步骤需参考下方[Link]()说明
 
 ## 下载安装
 
@@ -74,7 +75,7 @@ yarn add @react-native-ohos/gl-react-native
 ```json
 {
   "overrides": {
-    "@rnoh/react-native-openharmony": "^0.72.5" // ohpm 在线版本
+    "@rnoh/react-native-openharmony": "~0.72.139" // ohpm 在线版本
     // "@rnoh/react-native-openharmony" : "./react_native_openharmony.har" // 指向本地 har 包的路径
     // "@rnoh/react-native-openharmony" : "./react_native_openharmony" // 指向源码路径
   }
@@ -210,9 +211,6 @@ export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
   ];
 }
 ```
-
-> [!TIP] autolink 工程构建时 `RNOHPackagesFactory` 自动生成，ExpoGL/ExpoAsset TurboModule 注册自动完成，无需手工添加本步；仅当工程未接入 autolinking 时需要按上述方式手工注册。
-</details>
 
 ### 运行
 
@@ -427,9 +425,8 @@ BusProps
 ## 遗留问题
 
 - WebGL 扩展未桥接（`gl.getExtension` 返回 null）；float 线性过滤等能力依赖内置 uint8 降级路径
-- `image/jpeg` 快照回退为 PNG（像素内容一致，仅封装格式不同）；`webp` 快照同样降级 `png`
 - 不支持 `gl.texImage2D` 六参 DOM/ImageSource 源形式
-- WebP 图片纹理不支持（原生解码仅 PNG/JPEG）
+- WebP 图片纹理不支持
 - `captureAsDataURL` / `captureAsBlob` 上游仅 Web 实现，鸿蒙不提供（请用 `takeSnapshotAsync` / `capture`）
 - `msaaSamples`（GLView prop）上游即 iOS 专属，鸿蒙忽略该值
 
