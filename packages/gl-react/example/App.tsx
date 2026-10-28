@@ -30,8 +30,9 @@
  * 覆盖 gl-react 核心 API：Shaders/GLSL/Node/uniform（标量、数组、多 vec）、
  * connectSize、LinearCopy/NearestCopy、Bus、Uniform.Resolution/textureSizeRatio、
  * backbuffering+Uniform.Backbuffer、blendFunc/clear、快照导出（依绑定能力，失败有提示）。
- * 14~19 为 API 文档（gl-react-native-API.md）对照补测：Surface 属性/实例方法、
- * Node 属性补充、textureSize/backbufferFrom、Bus 数组、GLView headless、快照 options。
+ * 14~20 为 API 文档（gl-react-native-API.md）对照补测：Surface 属性/实例方法、
+ * Node 属性补充、textureSize/backbufferFrom、Bus 数组、GLView headless、
+ * 快照 options、capture 读回/rebootForDebug。
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
@@ -61,6 +62,7 @@ import {UniformExtraDemo} from './demos/uniform-extra';
 import {BusArrayDemo} from './demos/bus-array';
 import {HeadlessDemo} from './demos/headless';
 import {SnapshotOptionsDemo} from './demos/snapshot-options';
+import {CaptureRebootDemo} from './demos/capture-reboot';
 
 const img1 = require('./assets/img1.png');
 const mario = require('./assets/mario.png');
@@ -607,6 +609,12 @@ const CASES: DemoCaseDef[] = [
     title: '19. 快照 SnapshotOptions',
     desc: 'format jpeg/png/webp(降级) + flip + rect + compress',
     component: SnapshotOptionsDemo,
+  },
+  {
+    key: 'capture-reboot',
+    title: '20. capture 读回 + rebootForDebug',
+    desc: 'Surface/Node capture（readPixels 全画布/区域/离屏 FBO）+ rebootForDebug 上下文重建',
+    component: CaptureRebootDemo,
   },
 ];
 
