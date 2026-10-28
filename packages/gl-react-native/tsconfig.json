@@ -12,13 +12,8 @@
     "declarationMap": true,
     "declarationDir": "lib",
     "outDir": "lib",
-    "rootDir": "src",
-    "composite": true
+    "rootDir": "src"
   },
-  "references": [
-    { "path": "../gl-react" },
-    { "path": "../gl-react-expo" }
-  ],
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["lib", "node_modules"]
 }
