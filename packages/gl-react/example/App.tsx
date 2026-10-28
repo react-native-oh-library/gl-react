@@ -31,7 +31,7 @@
  * connectSize、LinearCopy/NearestCopy、Bus、Uniform.Resolution/textureSizeRatio、
  * backbuffering+Uniform.Backbuffer、blendFunc/clear、快照导出（依绑定能力，失败有提示）。
  */
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -39,7 +39,7 @@ import {
   Image,
   View,
 } from 'react-native';
-import {Surface} from 'gl-react-expo';
+import {Surface} from 'gl-react-native';
 import {
   Node,
   Shaders,

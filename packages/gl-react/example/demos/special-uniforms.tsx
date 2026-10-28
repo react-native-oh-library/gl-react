@@ -37,7 +37,7 @@
  */
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {Surface} from 'gl-react-expo';
+import {Surface} from 'gl-react-native';
 import {Node, Shaders, GLSL, Uniform} from 'gl-react';
 
 const mario = require('../assets/mario.png');

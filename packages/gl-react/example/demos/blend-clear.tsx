@@ -38,7 +38,7 @@
  */
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {Surface} from 'gl-react-expo';
+import {Surface} from 'gl-react-native';
 import {Node, Shaders, GLSL} from 'gl-react';
 
 const shaders = Shaders.create({
