@@ -10,9 +10,9 @@ The OpenHarmony-adapted packages of this library can be downloaded as tgz direct
 
 | Library Name    | Version    | Release Info     | RN Version Supported    | Autolink     | API Version     | Community Baseline    |  Source Code   |
 | ------------ | ------------ | ------------------------------ | ------------- | ------------- |------------------------ | ------------- | ------------- |
-| @react-native-ohos/gl-react-native | [~ 6.1.0-beta.1](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react-native) | [Github Releases](https://github.com/tyBrave/gl-react/releases) | 0.72.* | Yes | API13+ | 6.1.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react-native) |
-| @react-native-ohos/gl-react | [~ 1.0.0-beta.1](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react) | [Github Releases](https://github.com/tyBrave/gl-react/releases) | 0.72.* | Yes | API13+ | 6.0.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react) |
-| @react-native-ohos/expo-gl | [~ 1.0.0-beta.1](https://github.com/tyBrave/expo/tree/main/packages/expo-gl) | [Github Releases](https://github.com/tyBrave/expo/releases) | 0.72.* | Yes | API13+ | 58.0.3 | [main](https://github.com/tyBrave/expo/tree/main/packages/expo-gl) |
+| @react-native-ohos/gl-react-native | [~ 6.1.0(进行中)]() | [Github Releases]( https://github.com/react-native-oh-library/gl-react/releases) | 0.72.* / 0.77.* / 0.82.* / 0.84.* | Yes | API13+ | 6.1.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react-native) |
+| @react-native-ohos/gl-react | [~ 1.0.0(进行中)]() | [Github Releases]( https://github.com/react-native-oh-library/gl-react/releases) | 0.72.* / 0.77.* / 0.82.* / 0.84.* | Yes | API13+ | 6.0.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react) |
+| @react-native-ohos/expo-gl | [~ 1.0.0(进行中)]() | [Github Releases](https://github.com/tyBrave/expo/releases) | 0.72.* / 0.77.* / 0.82.* / 0.84.* | Yes | API13+ | 58.0.3 | [main](https://github.com/tyBrave/expo/tree/main/packages/expo-gl) |
 
 ## Introduction
 

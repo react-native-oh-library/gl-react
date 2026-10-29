@@ -10,9 +10,9 @@
 
 | 三方库名称    | 三方库版本    | 发布信息     | 支持RN版本    | Autolink     | 编译API版本     | 社区基线版本    |  源码地址   |
 | ------------ | ------------ | ------------------------------ | ------------- | ------------- |------------------------ | ------------- | ------------- |
-| @react-native-ohos/gl-react-native | [~ 6.1.0-beta.1](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react-native) | [Github Releases](https://github.com/tyBrave/gl-react/releases) | 0.72.* | 是 | API13+ | 6.1.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react-native) |
-| @react-native-ohos/gl-react | [~ 1.0.0-beta.1](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react) | [Github Releases](https://github.com/tyBrave/gl-react/releases) | 0.72.* | 是 | API13+ | 6.0.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react) |
-| @react-native-ohos/expo-gl | [~ 1.0.0-beta.1](https://github.com/tyBrave/expo/tree/main/packages/expo-gl) | [Github Releases](https://github.com/tyBrave/expo/releases) | 0.72.* | 是 | API13+ | 58.0.3 | [main](https://github.com/tyBrave/expo/tree/main/packages/expo-gl) |
+| @react-native-ohos/gl-react-native | [~ 6.1.0(in progress)]() | [Github Releases]( https://github.com/react-native-oh-library/gl-react/releases) | 0.72.* / 0.77.* / 0.82.* / 0.84.* | 是 | API13+ | 6.1.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react-native) |
+| @react-native-ohos/gl-react | [~ 1.0.0(in progress)]() | [Github Releases]( https://github.com/react-native-oh-library/gl-react/releases) | 0.72.* / 0.77.* / 0.82.* / 0.84.* | 是 | API13+ | 6.0.0 | [master](https://github.com/tyBrave/gl-react/tree/master/packages/gl-react) |
+| @react-native-ohos/expo-gl | [~ 1.0.0(in progress)]() | [Github Releases](https://github.com/tyBrave/expo/releases) | 0.72.* / 0.77.* / 0.82.* / 0.84.* | 是 | API13+ | 58.0.3 | [main](https://github.com/tyBrave/expo/tree/main/packages/expo-gl) |
 
 ## 简介
 
