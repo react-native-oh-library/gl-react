@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5)
 
 # @actor RNOH_APP
 function(autolink_libraries target)
-    add_subdirectory("${OH_MODULES_DIR}/@oh-rn/expo-gl/src/main/cpp" ./expo_gl)
+    add_subdirectory("${OH_MODULES_DIR}/@react-native-ohos/expo-gl/src/main/cpp" ./expo_gl)
 
     set(AUTOLINKED_LIBRARIES
         expo_gl

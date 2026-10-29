@@ -3,7 +3,7 @@
  * DO NOT modify it manually, your changes WILL be overwritten.
  */
 import type { RNPackageContext, RNOHPackage } from '@rnoh/react-native-openharmony';
-import ExpoGlPackage from '@oh-rn/expo-gl';
+import ExpoGlPackage from '@react-native-ohos/expo-gl';
 
 export function createRNOHPackages(ctx: RNPackageContext): RNOHPackage[] {
   return [

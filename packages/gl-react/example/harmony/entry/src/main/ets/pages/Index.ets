@@ -16,7 +16,7 @@ import {
   RNOHCoreContext
 } from '@rnoh/react-native-openharmony';
 import { createRNPackages } from '../RNPackagesFactory';
-import { ExpoGLView } from '@oh-rn/expo-gl';
+import { ExpoGLView } from '@react-native-ohos/expo-gl';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { http } from '@kit.NetworkKit';
 import { resourceManager } from '@kit.LocalizationKit';
@@ -58,17 +58,17 @@ function writeCacheFile(cacheDir: string, path: string, bytes: Uint8Array): void
 
 // 尽力而为：把 demo 纹理资源落成 cacheDir 下确定性名字的文件，失败只记日志
 function preloadDemoAssets(cacheDir: string, rm: resourceManager.ResourceManager): void {
-  console.error(`[AssetPreload] cacheDir=${cacheDir}`);
+  console.warn(`[AssetPreload] cacheDir=${cacheDir}`);
   for (let i = 0; i < PRELOAD_RAWFILES.length; i++) {
     const name = PRELOAD_RAWFILES[i];
     const path = `${cacheDir}/gl_asset_${name.split('/').join('_')}`;
     rm.getRawFileContent(name)
       .then((bytes: Uint8Array) => {
         writeCacheFile(cacheDir, path, bytes);
-        console.error(`[AssetPreload] wrote ${path} (${bytes.length} bytes)`);
+        console.warn(`[AssetPreload] wrote ${path} (${bytes.length} bytes)`);
       })
       .catch((error: BusinessError) => {
-        console.error(`[AssetPreload] rawfile ${name} failed: ${JSON.stringify(error.message)}`);
+        console.warn(`[AssetPreload] rawfile ${name} failed: ${JSON.stringify(error.message)}`);
       });
   }
   for (let i = 0; i < PRELOAD_URLS.length; i++) {
@@ -88,12 +88,12 @@ function preloadDemoAssets(cacheDir: string, rm: resourceManager.ResourceManager
           const data = resp.result as ArrayBuffer;
           writeCacheFile(cacheDir, `${cacheDir}/gl_asset_remote_${fileName}`, new Uint8Array(data));
         } else {
-          console.error(`[AssetPreload] ${url} HTTP ${resp.responseCode}`);
+          console.warn(`[AssetPreload] ${url} HTTP ${resp.responseCode}`);
         }
         httpRequest.destroy();
       })
       .catch((error: BusinessError) => {
-        console.error(`[AssetPreload] ${url} failed: ${JSON.stringify(error.message)}`);
+        console.warn(`[AssetPreload] ${url} failed: ${JSON.stringify(error.message)}`);
         httpRequest.destroy();
       });
   }

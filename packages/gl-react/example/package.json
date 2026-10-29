@@ -19,12 +19,15 @@
   },
   "dependencies": {
     "@react-native-oh/react-native-harmony": "0.72.139",
-    "react": "18.2.0",
-    "react-native": "0.72.5",
-    "@oh-rn/expo-gl": "file:../oh-rn-expo-gl-58.0.0.tgz",
-    "@react-native-ohos/gl-react": "file:..",
+    "@react-native-ohos/expo-asset": "file:../react-native-ohos-expo-asset-1.0.0-beta.1.tgz",
+    "@react-native-ohos/expo-gl": "file:../react-native-ohos-expo-gl-1.0.0-beta.1.tgz",
+    "@react-native-ohos/expo-modules-core": "file:../react-native-ohos-expo-modules-core-1.0.0-beta.1.tgz",
+    "@react-native-ohos/gl-react": "file:../react-native-ohos-gl-react-1.0.0-beta.1.tgz",
+    "@react-native-ohos/gl-react-native": "file:../react-native-ohos-gl-react-native-6.1.0-beta.1.tgz",
     "gl-react": "^6.0.0",
-    "gl-react-expo": "^6.0.0"
+    "gl-react-expo": "^6.0.0",
+    "react": "18.2.0",
+    "react-native": "0.72.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

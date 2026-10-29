@@ -4,7 +4,7 @@
   "displayName": "gl-react (React Native HarmonyOS)",
   "license": "MIT",
   "author": "Gaëtan Renaudeau <renaudeau.gaetan@gmail.com>",
-  "description": "gl-react HarmonyOS adaptation: universal React library to write and compose WebGL shaders on OpenHarmony (core + GLView binding + native EGL/GLES layer in one package)",
+  "description": "gl-react HarmonyOS adaptation: platform-agnostic core with upstream fixes (e.g. blendFunc guard no longer treats gl.ZERO as missing). Platform bindings are provided by gl-react-native / expo-gl on their respective targets; on harmony, @react-native-ohos/gl-react-native + @react-native-ohos/expo-gl provide them. Pure JS package — no native module.",
   "keywords": [
     "gl-react",
     "react-native",
@@ -24,7 +24,6 @@
   "files": [
     "src",
     "lib",
-    "harmony",
     "README.md",
     "README_EN.md",
     "CHANGELOG.md",
@@ -34,7 +33,6 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "codegen-lib": "react-native codegen-harmony --cpp-output-path ./harmony/gl_react_dev/src/main/cpp/generated --ets-output-path ./harmony/gl_react_dev/src/main/ets/generated",
     "jtest": "jest --config jtest/jest.config.js",
     "jtest:coverage": "jest --config jtest/jest.config.js --coverage"
   },
@@ -70,20 +68,6 @@
     "node": ">=18"
   },
   "harmony": {
-    "alias": "gl-react",
-    "autolinking": {
-      "cmakeLibraryTargetName": "gl_react_dev",
-      "ohPackageName": "@react-native-ohos/gl-react",
-      "etsPackageClassName": "GlReactDevPackage",
-      "cppPackageClassName": "GlReactDevPackage"
-    },
-    "codegenConfig": [
-      {
-        "version": 1,
-        "specPaths": [
-          "./src/specs/v1"
-        ]
-      }
-    ]
+    "alias": "gl-react"
   }
 }

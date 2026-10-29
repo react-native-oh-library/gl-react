@@ -1030,7 +1030,9 @@ export default class Node extends Component<Props, any> {
     if (blendFunc) {
       const src = mapBlendFunc(gl, blendFunc.src);
       const dst = mapBlendFunc(gl, blendFunc.dst);
-      if (src && dst) gl.blendFunc(src, dst);
+      // gl.ZERO === 0: check for undefined, not truthiness, or pairs like
+      // {src: 'one', dst: 'zero'} are silently dropped.
+      if (src !== undefined && dst !== undefined) gl.blendFunc(src, dst);
     }
 
     if (clear) {

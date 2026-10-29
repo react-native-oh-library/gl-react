@@ -30,8 +30,11 @@
  * 覆盖 gl-react 核心 API：Shaders/GLSL/Node/uniform（标量、数组、多 vec）、
  * connectSize、LinearCopy/NearestCopy、Bus、Uniform.Resolution/textureSizeRatio、
  * backbuffering+Uniform.Backbuffer、blendFunc/clear、快照导出（依绑定能力，失败有提示）。
+ * 14~20 为 API 文档（gl-react-native-API.md）对照补测：Surface 属性/实例方法、
+ * Node 属性补充、textureSize/backbufferFrom、Bus 数组、GLView headless、
+ * 快照 options、capture 读回/rebootForDebug。
  */
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -39,7 +42,7 @@ import {
   Image,
   View,
 } from 'react-native';
-import {Surface} from 'gl-react-expo';
+import {Surface} from 'gl-react-native';
 import {
   Node,
   Shaders,
@@ -53,6 +56,13 @@ import {BusComparisonDemo} from './demos/bus';
 import {CopyCompareDemo, TilingDemo} from './demos/sampling';
 import {ResolutionGridDemo, AspectFitDemo} from './demos/special-uniforms';
 import {BlendClearDemo} from './demos/blend-clear';
+import {SurfaceApiDemo} from './demos/surface-api';
+import {NodeApiDemo} from './demos/node-api';
+import {UniformExtraDemo} from './demos/uniform-extra';
+import {BusArrayDemo} from './demos/bus-array';
+import {HeadlessDemo} from './demos/headless';
+import {SnapshotOptionsDemo} from './demos/snapshot-options';
+import {CaptureRebootDemo} from './demos/capture-reboot';
 
 const img1 = require('./assets/img1.png');
 const mario = require('./assets/mario.png');
@@ -563,6 +573,48 @@ const CASES: DemoCaseDef[] = [
     title: '13. blendFunc / clear',
     desc: 'Node 画进 FBO 的 GL 状态控制',
     component: BlendCase,
+  },
+  {
+    key: 'surface-api',
+    title: '14. Surface 属性/实例方法',
+    desc: 'preload / onLoad / visitor / glIsAvailable / getGLSize / redraw / flush / listSurfaces / msaaSamples 忽略',
+    component: SurfaceApiDemo,
+  },
+  {
+    key: 'node-api',
+    title: '15. Node 属性补充',
+    desc: '内联 shader / ignoreUnusedUniforms / onDraw / clear:null 拖尾',
+    component: NodeApiDemo,
+  },
+  {
+    key: 'uniform-extra',
+    title: '16. textureSize / backbufferFrom / 弃用 Backbuffer',
+    desc: 'Uniform.textureSize 尺寸可视化 + backbufferFrom 跨节点采样 + 弃用字符串警告',
+    component: UniformExtraDemo,
+  },
+  {
+    key: 'bus-array',
+    title: '17. Bus 纹理数组 + 函数式 children',
+    desc: 'sampler2D[3] + Bus index 0/1/2 + (redraw)=>Node',
+    component: BusArrayDemo,
+  },
+  {
+    key: 'headless',
+    title: '18. GLView headless 上下文',
+    desc: 'createContextAsync → 自建 FBO → takeSnapshotAsync(framebuffer) → destroyContextAsync',
+    component: HeadlessDemo,
+  },
+  {
+    key: 'snapshot-options',
+    title: '19. 快照 SnapshotOptions',
+    desc: 'format jpeg/png/webp(降级) + flip + rect + compress',
+    component: SnapshotOptionsDemo,
+  },
+  {
+    key: 'capture-reboot',
+    title: '20. capture 读回 + rebootForDebug',
+    desc: 'Surface/Node capture（readPixels 全画布/区域/离屏 FBO）+ rebootForDebug 上下文重建',
+    component: CaptureRebootDemo,
   },
 ];
 
