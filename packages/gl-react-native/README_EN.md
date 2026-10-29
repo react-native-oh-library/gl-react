@@ -42,11 +42,11 @@ Choose the library versions matching the RN framework version of your applicatio
 
 | RN Framework Version | OpenHarmony-adapted Library | Supported Version Range |
 | --- | --- | --- |
-| 0.72 | @react-native-ohos/gl-react | >=1.0.0-beta.1 <1.1.0 |
-| | @react-native-ohos/gl-react-native | >=6.1.0-beta.1 <6.2.0 |
-| | @react-native-ohos/expo-gl | >=1.0.0-beta.1 <1.1.0 |
-| | @react-native-ohos/expo-asset | >=1.0.0-beta.1 <1.1.0 |
-| | @react-native-ohos/expo-modules-core | >=1.0.0-beta.1 <1.1.0 |
+| 0.72、0.77、0.82、0.84 | @react-native-ohos/gl-react | >=1.0.0 <1.1.0 |
+| | @react-native-ohos/gl-react-native | >=6.1.0 <6.2.0 |
+| | @react-native-ohos/expo-gl | >=1.0.0 <1.1.0 |
+| | @react-native-ohos/expo-asset | >=1.0.0 <1.1.0 |
+| | @react-native-ohos/expo-modules-core | >=1.0.0 <1.1.0 |
 
 The OpenHarmony implementation of this library depends on the adapted libraries above. If they are already included in your OpenHarmony application project, skip this section.
 
